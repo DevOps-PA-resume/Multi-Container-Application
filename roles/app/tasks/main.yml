@@ -1,0 +1,63 @@
+---
+- name: Clone the repository
+  git:
+    repo: "{{ app_repo }}"
+    dest: "{{ app_path }}"
+    version: main
+    force: yes
+
+- name: Dummy build step
+  command: npm install
+  args:
+    chdir: "{{ app_path }}/server"
+
+- name: Pull server image
+  community.docker.docker_image:
+    name: therealpad/my-node-app
+    source: pull
+
+- name: Build image and with build args
+  community.docker.docker_image:
+    name: "{{ app_name }}"
+    build:
+      path: "{{ app_path }}/server"
+    source: build
+
+- name: Create systemd service to run Node.js Docker container
+  copy:
+    dest: "/etc/systemd/system/{{ app_name }}.service"
+    content: |
+      [Unit]
+      Description=Docker Container {{ app_name }}
+      After=docker.service
+      Requires=docker.service
+
+      [Service]
+      Restart=always
+      RestartSec=5
+      ExecStartPre=-/usr/bin/docker stop {{ app_name }}
+      ExecStartPre=-/usr/bin/docker rm {{ app_name }}
+      ExecStart=/usr/bin/docker run \
+        -p 3000:3000 \
+        -e USERNAME={{ node_username }} \
+        -e PASSWORD={{ node_password }} \
+        -e SECRET_MESSAGE='{{ secret_message }}' \
+        {{ app_name }}
+      ExecStop=/usr/bin/docker stop {{ app_name }}
+
+      [Install]
+      WantedBy=multi-user.target
+
+- name: Reload systemd to pick up new service
+  command: systemctl daemon-reload
+
+- name: Enable and start the Node.js Docker container service
+  systemd:
+    name: "{{ app_name }}"
+    enabled: yes
+    state: started
+
+- name: Restart Node.js Docker container service to load new code
+  systemd:
+    name: "{{ app_name }}"
+    state: restarted

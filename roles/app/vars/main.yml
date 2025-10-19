@@ -1,0 +1,7 @@
+app_name: nodejs-service
+app_repo: "https://github.com/DevOps-PA-resume/Multi-Container-Application"
+app_path: "/var/www/nodejs-service"
+node_app_port: 3000
+node_username: "admin"
+node_password: "password"
+secret_message: "c kool ansible (multi container application)"

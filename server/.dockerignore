@@ -1,0 +1,45 @@
+# Node dependencies
+node_modules
+npm-debug.log
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+pnpm-lock.yaml
+# (if you copy dependencies manually, you may keep the lock file)
+
+# Logs
+logs
+*.log
+
+# Build output
+dist
+build
+coverage
+
+# System / OS files
+.DS_Store
+Thumbs.db
+
+# Git & version control
+.git
+.gitignore
+.gitattributes
+
+# Environment & secrets
+.env
+.env.*
+!.env.example  # keep example env files if you have one
+
+# Docker & CI
+.dockerignore
+Dockerfile*
+docker-compose*.yml
+.idea
+.vscode
+*.swp
+
+# Cache / temporary
+*.tgz
+.cache
+.tmp
+.nyc_output
