@@ -6,7 +6,7 @@
     version: main
     force: yes
 
-- name: Dummy build step
+- name: Build step
   command: npm install
   args:
     chdir: "{{ app_path }}/server"
@@ -23,41 +23,16 @@
       path: "{{ app_path }}/server"
     source: build
 
-- name: Create systemd service to run Node.js Docker container
-  copy:
-    dest: "/etc/systemd/system/{{ app_name }}.service"
-    content: |
-      [Unit]
-      Description=Docker Container {{ app_name }}
-      After=docker.service
-      Requires=docker.service
-
-      [Service]
-      Restart=always
-      RestartSec=5
-      ExecStartPre=-/usr/bin/docker stop {{ app_name }}
-      ExecStartPre=-/usr/bin/docker rm {{ app_name }}
-      ExecStart=/usr/bin/docker run \
-        -p 3000:3000 \
-        -e USERNAME={{ node_username }} \
-        -e PASSWORD={{ node_password }} \
-        -e SECRET_MESSAGE='{{ secret_message }}' \
-        {{ app_name }}
-      ExecStop=/usr/bin/docker stop {{ app_name }}
-
-      [Install]
-      WantedBy=multi-user.target
-
-- name: Reload systemd to pick up new service
-  command: systemctl daemon-reload
-
-- name: Enable and start the Node.js Docker container service
-  systemd:
-    name: "{{ app_name }}"
-    enabled: yes
+- name: Run Node.js container
+  community.docker.docker_container:
+    name: my-node-app
+    image: "{{ app_name }}"
     state: started
-
-- name: Restart Node.js Docker container service to load new code
-  systemd:
-    name: "{{ app_name }}"
-    state: restarted
+    restart_policy: always
+    ports:
+      - "3000:3000"
+    env:
+      PORT: "3000"
+      USERNAME: "{{ node_username }}"
+      PASSWORD: "{{ node_password }}"
+      SECRET_MESSAGE: "{{ secret_message }}"
