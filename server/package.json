@@ -12,8 +12,10 @@
   "description": "",
   "dependencies": {
     "dotenv": "^17.2.3",
-    "express": "^5.1.0",
-    "express-basic-auth": "^1.2.1"
+    "express": "^4.21.2",
+    "express-basic-auth": "^1.2.1",
+    "express-restify-mongoose": "^9.0.10",
+    "mongoose": "^8.19.2"
   },
   "devDependencies": {
     "eslint": "^9.37.0"
