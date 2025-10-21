@@ -16,3 +16,16 @@
       - docker.io
     state: present
 
+- name: Ensure the Docker CLI plugin directory exists
+  ansible.builtin.file:
+    path: /usr/local/lib/docker/cli-plugins
+    state: directory
+    mode: '0755'
+
+- name: Download the Docker Compose V2 binary as a plugin
+  ansible.builtin.get_url:
+    # Use the same URL you had
+    url: "https://github.com/docker/compose/releases/download/v2.21.0/docker-compose-{{ ansible_system }}-{{ ansible_architecture }}"
+    # IMPORTANT: Change the destination to the plugin directory
+    dest: "/usr/local/lib/docker/cli-plugins/docker-compose"
+    mode: '0755' # Set permissions to be executable

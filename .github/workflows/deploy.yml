@@ -56,8 +56,8 @@ jobs:
       - name: Run Ansible Playbook
         run: |
           ansible-playbook -i inventory.ini setup.yml \
-            --extra-vars "node_username=${{ secrets.NODE_USERNAME }} \
-                          node_password=${{ secrets.NODE_PASSWORD }} \
-                          secret_message='${{ secrets.SECRET_MESSAGE }}'"
+            --extra-vars "mongo_uri=${{ secrets.MONGO_URI }} \
+                          mongo_initdb_root_username=${{ secrets.MONGO_INITDB_ROOT_USERNAME }} \
+                          mongo_initdb_root_password='${{ secrets.MONGO_INITDB_ROOT_PASSWORD }}'"
         env:
           ANSIBLE_HOST_KEY_CHECKING: "False"

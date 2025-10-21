@@ -6,33 +6,21 @@
     version: main
     force: yes
 
-- name: Build step
-  command: npm install
-  args:
-    chdir: "{{ app_path }}/server"
+- name: Create .env file for Docker Compose
+  ansible.builtin.template:
+    src: .env.j2
+    dest: "{{ app_path }}/server/.env"
+    owner: root
+    group: root
+    mode: '0600'
 
-- name: Pull server image
-  community.docker.docker_image:
-    name: therealpad/my-node-app
-    source: pull
-
-- name: Build image and with build args
-  community.docker.docker_image:
-    name: "{{ app_name }}"
-    build:
-      path: "{{ app_path }}/server"
-    source: build
-
-- name: Run Node.js container
-  community.docker.docker_container:
-    name: my-node-app
-    image: "{{ app_name }}"
-    state: started
-    restart_policy: always
-    ports:
-      - "3000:3000"
-    env:
-      PORT: "3000"
-      USERNAME: "{{ node_username }}"
-      PASSWORD: "{{ node_password }}"
-      SECRET_MESSAGE: "{{ secret_message }}"
+- name: Start Node.js and MongoDB containers with Docker Compose
+  community.docker.docker_compose_v2:
+    project_src: "{{ app_path }}/server"
+    build: always
+    state: present
+  environment:
+    PORT: "{{ node_app_port }}"
+    MONGO_URI: "{{ mongo_uri }}"
+    MONGO_INITDB_ROOT_USERNAME: "{{ mongo_initdb_root_username }}"
+    MONGO_INITDB_ROOT_PASSWORD: "{{ mongo_initdb_root_password }}"
